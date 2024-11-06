@@ -5,7 +5,7 @@ FROM python:3.9-slim
 WORKDIR /app
 
 # Copy the current directory contents (including requirements.txt) into the container at /app
-COPY . /app
+COPY ./docker/* /app
 
 # Install the required dependencies
 RUN pip install --no-cache-dir -r docker/requirements.txt
