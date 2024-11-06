@@ -19,7 +19,6 @@ def create_connection():
     except Error as e:
         print(f"Error: '{e}'")
     return connection
-
 # Create route to add a new record
 @app.route('/create', methods=['POST'])
 def create_record():
@@ -32,10 +31,11 @@ def create_record():
     # Extract data from JSON
     name = data.get('name')
     age = data.get('age')
+    hkd_id = data.get('hkd_id')
 
     # Insert the record into the MySQL table
     try:
-        cursor.execute("INSERT INTO users (name, age) VALUES (%s, %s)", (name, age))
+        cursor.execute("INSERT INTO your_table (name, age, hkd_id) VALUES (%s, %s, %s)", (name, age, hkd_id))
         connection.commit()  # Commit the transaction
         response = {'message': 'Record added successfully!'}
     except Error as e:
@@ -53,12 +53,12 @@ def read_records():
     connection = create_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM users")
+    cursor.execute("SELECT * FROM your_table")
     records = cursor.fetchall()
 
     result = []
     for row in records:
-        result.append({'id': row[0], 'name': row[1], 'age': row[2]})
+        result.append({'id': row[0], 'name': row[1], 'age': row[2], 'hkd_id': row[3]})
 
     cursor.close()
     connection.close()
@@ -75,10 +75,11 @@ def update_record(id):
     data = request.get_json()
     new_name = data.get('name')
     new_age = data.get('age')
+    new_hkd_id = data.get('hkd_id')
 
     # Update the record in the MySQL table
     try:
-        cursor.execute("UPDATE users SET name = %s, age = %s WHERE id = %s", (new_name, new_age, id))
+        cursor.execute("UPDATE your_table SET name = %s, age = %s, hkd_id = %s WHERE id = %s", (new_name, new_age, new_hkd_id, id))
         connection.commit()  # Commit the transaction
         if cursor.rowcount > 0:
             response = {'message': 'Record updated successfully!'}
@@ -101,7 +102,7 @@ def delete_record(id):
 
     # Delete the record from the MySQL table
     try:
-        cursor.execute("DELETE FROM users WHERE id = %s", (id,))
+        cursor.execute("DELETE FROM your_table WHERE id = %s", (id,))
         connection.commit()  # Commit the transaction
         if cursor.rowcount > 0:
             response = {'message': 'Record deleted successfully!'}
