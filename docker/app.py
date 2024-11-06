@@ -35,14 +35,14 @@ def create_record():
 
     # Step 1: Check if the HKID already exists in the database
     try:
-        cursor.execute("SELECT COUNT(*) FROM your_table WHERE hkd_id = %s", (hkd_id,))
+        cursor.execute("SELECT COUNT(*) FROM users WHERE hkd_id = %s", (hkd_id,))
         result = cursor.fetchone()
         if result[0] > 0:
             # If HKID exists, return an error response
             response = {'message': 'Error: HKID already exists. Cannot insert duplicate HKID.'}
         else:
             # Step 2: If HKID is unique, insert the new record
-            cursor.execute("INSERT INTO your_table (name, age, hkd_id) VALUES (%s, %s, %s)", (name, age, hkd_id))
+            cursor.execute("INSERT INTO users (name, age, hkd_id) VALUES (%s, %s, %s)", (name, age, hkd_id))
             connection.commit()  # Commit the transaction
             response = {'message': 'Record added successfully!'}
     except Error as e:
