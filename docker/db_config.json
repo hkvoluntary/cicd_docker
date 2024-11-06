@@ -1,0 +1,6 @@
+{
+    "host": "172.17.0.3",
+    "user": "sql",
+    "password": "sql1245",
+    "database": "test_db"
+}
