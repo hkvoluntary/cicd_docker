@@ -1,4 +1,4 @@
-from flask import Flask
+from flask import Flask, request, jsonify
 import mysql.connector
 from mysql.connector import Error
 
@@ -9,10 +9,10 @@ def create_connection():
     connection = None
     try:
         connection = mysql.connector.connect(
-            host='172.17.0.3',   # Host where MySQL is running (e.g., 'localhost' or Docker container name)
-            user='sql',  # Your MySQL username
-            password='sql1245',  # Your MySQL password
-            database='test_db'  # The database you want to connect to
+            host='mysql_host',   # MySQL host (e.g., 'localhost' or Docker container name)
+            user='your_username',  # MySQL username
+            password='your_password',  # MySQL password
+            database='your_database'  # Database name
         )
         if connection.is_connected():
             print('Connection to MySQL successful')
@@ -20,27 +20,101 @@ def create_connection():
         print(f"Error: '{e}'")
     return connection
 
-@app.route('/')
-def hello_world():
-    # Connect to the MySQL database
+# Create route to add a new record
+@app.route('/create', methods=['POST'])
+def create_record():
     connection = create_connection()
     cursor = connection.cursor()
 
-    # Example query (make sure you have a table and some data in the DB)
-    cursor.execute("SELECT * FROM users LIMIT 1")
-    result = cursor.fetchone()  # Fetch one record
+    # Get data from POST request body
+    data = request.get_json()
 
-    # Return data from MySQL as part of the response
-    if result:
-        message = f"Hello, Docker World! First record from MySQL: {result}"
-    else:
-        message = "Hello, Docker World! No data found in MySQL."
+    # Extract data from JSON
+    name = data.get('name')
+    age = data.get('age')
 
-    # Close the connection
+    # Insert the record into the MySQL table
+    try:
+        cursor.execute("INSERT INTO your_table (name, age) VALUES (%s, %s)", (name, age))
+        connection.commit()  # Commit the transaction
+        response = {'message': 'Record added successfully!'}
+    except Error as e:
+        connection.rollback()  # Rollback in case of error
+        response = {'message': f'Error: {e}'}
+
     cursor.close()
     connection.close()
 
-    return message
+    return jsonify(response)
+
+# Read route to fetch all records
+@app.route('/read', methods=['GET'])
+def read_records():
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    cursor.execute("SELECT * FROM your_table")
+    records = cursor.fetchall()
+
+    result = []
+    for row in records:
+        result.append({'id': row[0], 'name': row[1], 'age': row[2]})
+
+    cursor.close()
+    connection.close()
+
+    return jsonify(result)
+
+# Update route to modify an existing record
+@app.route('/update/<int:id>', methods=['PUT'])
+def update_record(id):
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    # Get data from PUT request body
+    data = request.get_json()
+    new_name = data.get('name')
+    new_age = data.get('age')
+
+    # Update the record in the MySQL table
+    try:
+        cursor.execute("UPDATE your_table SET name = %s, age = %s WHERE id = %s", (new_name, new_age, id))
+        connection.commit()  # Commit the transaction
+        if cursor.rowcount > 0:
+            response = {'message': 'Record updated successfully!'}
+        else:
+            response = {'message': 'No record found with the provided ID'}
+    except Error as e:
+        connection.rollback()  # Rollback in case of error
+        response = {'message': f'Error: {e}'}
+
+    cursor.close()
+    connection.close()
+
+    return jsonify(response)
+
+# Delete route to remove a record
+@app.route('/delete/<int:id>', methods=['DELETE'])
+def delete_record(id):
+    connection = create_connection()
+    cursor = connection.cursor()
+
+    # Delete the record from the MySQL table
+    try:
+        cursor.execute("DELETE FROM your_table WHERE id = %s", (id,))
+        connection.commit()  # Commit the transaction
+        if cursor.rowcount > 0:
+            response = {'message': 'Record deleted successfully!'}
+        else:
+            response = {'message': 'No record found with the provided ID'}
+    except Error as e:
+        connection.rollback()  # Rollback in case of error
+        response = {'message': f'Error: {e}'}
+
+    cursor.close()
+    connection.close()
+
+    return jsonify(response)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)
