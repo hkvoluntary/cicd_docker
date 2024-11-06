@@ -43,12 +43,7 @@ def create_connection():
         logging.error("MySQL configuration could not be loaded.")
         return None
     try:
-        connection = mysql.connector.connect(
-            host='172.17.0.3',   # MySQL host (e.g., 'localhost' or Docker container name)
-            user='sql',  # MySQL username
-            password='sql1245',  # MySQL password
-            database='test_db'  # Database name
-        )
+        connection = mysql.connector.connect(**db_config)
         if connection.is_connected():
             logging.debug("Connection to MySQL successful")
     except Error as e:
