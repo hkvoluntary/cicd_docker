@@ -35,7 +35,7 @@ def create_record():
 
     # Insert the record into the MySQL table
     try:
-        cursor.execute("INSERT INTO your_table (name, age, hkd_id) VALUES (%s, %s, %s)", (name, age, hkd_id))
+        cursor.execute("INSERT INTO users (name, age, hkd_id) VALUES (%s, %s, %s)", (name, age, hkd_id))
         connection.commit()  # Commit the transaction
         response = {'message': 'Record added successfully!'}
     except Error as e:
@@ -53,7 +53,7 @@ def read_records():
     connection = create_connection()
     cursor = connection.cursor()
 
-    cursor.execute("SELECT * FROM your_table")
+    cursor.execute("SELECT * FROM users")
     records = cursor.fetchall()
 
     result = []
@@ -79,7 +79,7 @@ def update_record(id):
 
     # Update the record in the MySQL table
     try:
-        cursor.execute("UPDATE your_table SET name = %s, age = %s, hkd_id = %s WHERE id = %s", (new_name, new_age, new_hkd_id, id))
+        cursor.execute("UPDATE users SET name = %s, age = %s, hkd_id = %s WHERE id = %s", (new_name, new_age, new_hkd_id, id))
         connection.commit()  # Commit the transaction
         if cursor.rowcount > 0:
             response = {'message': 'Record updated successfully!'}
@@ -102,7 +102,7 @@ def delete_record(id):
 
     # Delete the record from the MySQL table
     try:
-        cursor.execute("DELETE FROM your_table WHERE id = %s", (id,))
+        cursor.execute("DELETE FROM users WHERE id = %s", (id,))
         connection.commit()  # Commit the transaction
         if cursor.rowcount > 0:
             response = {'message': 'Record deleted successfully!'}
