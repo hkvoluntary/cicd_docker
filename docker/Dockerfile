@@ -13,17 +13,21 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Set environment variable for Flask environment (default to development)
 # Set to 'development' for development environment
 #ENV FLASK_ENV=production  
+# Expose the port the app will run on (if necessary)
+EXPOSE 5000
 
-FROM base as production
-ENV FLASK_ENV=production
 # Multi-stage build for development and production
 FROM base as development
 ENV FLASK_ENV=development
 
+# Default command for development (runs Flask's built-in development server)
+CMD ["flask", "run", "--host=0.0.0.0"]
 
+FROM base as production
+ENV FLASK_ENV=production
+# Default command for production (runs the app with Gunicorn)
+CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
 
-# Expose the port the app will run on (if necessary)
-EXPOSE 5000
 
 # Set the default command to run your application
-CMD ["python", "app.py"]
+#CMD ["python", "app.py"]
