@@ -1,14 +1,27 @@
+import os
+import logging
 from flask import Flask, request, jsonify
 import mysql.connector
 from mysql.connector import Error
-import logging
 
 app = Flask(__name__)
 
-# Set up logging configuration
-logging.basicConfig(level=logging.DEBUG,  # Log level (DEBUG will log all messages)
-                    format='%(asctime)s - %(levelname)s - %(message)s', 
-                    handlers=[logging.StreamHandler()])  # Logs to console
+# Get the environment from the environment variable (default to development)
+env = os.getenv('FLASK_ENV', 'development').lower()
+
+# Set up logging based on environment
+if env == 'production':
+    # In production, log only errors
+    logging.basicConfig(level=logging.ERROR,  # Only ERROR messages will be logged
+                        format='%(asctime)s - %(levelname)s - %(message)s',
+                        handlers=[logging.StreamHandler()])
+    logging.info("Logging set to ERROR level (Production).")
+else:
+    # In development, log all levels (DEBUG, INFO, WARNING, ERROR)
+    logging.basicConfig(level=logging.DEBUG,  # DEBUG will log all messages
+                        format='%(asctime)s - %(levelname)s - %(message)s',
+                        handlers=[logging.StreamHandler()])
+    logging.info("Logging set to DEBUG level (Development).")
 
 # MySQL connection configuration
 def create_connection():
@@ -21,7 +34,7 @@ def create_connection():
             database='test_db'  # Database name
         )
         if connection.is_connected():
-            logging.info('Connection to MySQL successful')
+            logging.debug("Connection to MySQL successful")
     except Error as e:
         logging.error(f"Error connecting to MySQL: '{e}'")
     return connection
@@ -45,7 +58,7 @@ def create_record():
         cursor.execute("SELECT COUNT(*) FROM users WHERE hkd_id = %s", (hkd_id,))
         result = cursor.fetchone()
         if result[0] > 0:
-            # If HKID exists, log an error and return an error response
+            # If HKID exists, log a warning and return an error response
             logging.warning(f"Duplicate HKID detected: {hkd_id}. Cannot insert record.")
             response = {'message': 'Error: HKID already exists. Cannot insert duplicate HKID.'}
         else:
@@ -78,7 +91,7 @@ def read_records():
         for row in records:
             result.append({'id': row[0], 'name': row[1], 'age': row[2], 'hkd_id': row[3]})
 
-        logging.info(f"Retrieved {len(result)} records from the database.")
+        logging.debug(f"Retrieved {len(result)} records from the database.")
     except Error as e:
         logging.error(f"Error during reading records: {e}")
         result = []
