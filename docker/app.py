@@ -13,13 +13,13 @@ env = os.getenv('FLASK_ENV', 'development').lower()
 if env == 'production':
     # In production, log only errors
     logging.basicConfig(level=logging.ERROR,  # Only ERROR messages will be logged
-                        format='%(asctime)s - %(levelname)s - %(message)s',
+                        format='%(asctime)s - %(levelname)s - Python Logging Message: %(message)s',
                         handlers=[logging.StreamHandler()])
     logging.info("Logging set to ERROR level (Production).")
 else:
     # In development, log all levels (DEBUG, INFO, WARNING, ERROR)
     logging.basicConfig(level=logging.DEBUG,  # DEBUG will log all messages
-                        format='%(asctime)s - %(levelname)s - %(message)s',
+                        format='%(asctime)s - %(levelname)s - Python Logging Message: %(message)s',
                         handlers=[logging.StreamHandler()])
     logging.info("Logging set to DEBUG level (Development).")
 
@@ -34,9 +34,9 @@ def create_connection():
             database='test_db'  # Database name
         )
         if connection.is_connected():
-            logging.debug("Connection to MySQL successful")
+            logging.debug("Python Logging Message: Connection to MySQL successful")
     except Error as e:
-        logging.error(f"Error connecting to MySQL: '{e}'")
+        logging.error(f"Python Logging Message: Error connecting to MySQL: '{e}'")
     return connection
 
 # Create route to add a new record with HKID check
@@ -59,17 +59,17 @@ def create_record():
         result = cursor.fetchone()
         if result[0] > 0:
             # If HKID exists, log a warning and return an error response
-            logging.warning(f"Duplicate HKID detected: {hkd_id}. Cannot insert record.")
+            logging.warning(f"Python Logging Message: Duplicate HKID detected: {hkd_id}. Cannot insert record.")
             response = {'message': 'Error: HKID already exists. Cannot insert duplicate HKID.'}
         else:
             # Step 2: If HKID is unique, insert the new record
             cursor.execute("INSERT INTO users (name, age, hkd_id) VALUES (%s, %s, %s)", (name, age, hkd_id))
             connection.commit()  # Commit the transaction
-            logging.info(f"Record added successfully: {name}, {age}, {hkd_id}")
+            logging.info(f"Python Logging Message: Record added successfully: {name}, {age}, {hkd_id}")
             response = {'message': 'Record added successfully!'}
     except Error as e:
         connection.rollback()  # Rollback in case of error
-        logging.error(f"Error during record insertion: {e}")
+        logging.error(f"Python Logging Message: Error during record insertion: {e}")
         response = {'message': f'Error: {e}'}
 
     cursor.close()
@@ -91,9 +91,9 @@ def read_records():
         for row in records:
             result.append({'id': row[0], 'name': row[1], 'age': row[2], 'hkd_id': row[3]})
 
-        logging.debug(f"Retrieved {len(result)} records from the database.")
+        logging.debug(f"Python Logging Message: Retrieved {len(result)} records from the database.")
     except Error as e:
-        logging.error(f"Error during reading records: {e}")
+        logging.error(f"Python Logging Message: Error during reading records: {e}")
         result = []
 
     cursor.close()
@@ -118,14 +118,14 @@ def update_record(id):
         cursor.execute("UPDATE users SET name = %s, age = %s, hkd_id = %s WHERE id = %s", (new_name, new_age, new_hkd_id, id))
         connection.commit()  # Commit the transaction
         if cursor.rowcount > 0:
-            logging.info(f"Record with ID {id} updated successfully.")
+            logging.info(f"Python Logging Message: Record with ID {id} updated successfully.")
             response = {'message': 'Record updated successfully!'}
         else:
-            logging.warning(f"No record found with ID {id} for update.")
+            logging.warning(f"Python Logging Message: No record found with ID {id} for update.")
             response = {'message': 'No record found with the provided ID'}
     except Error as e:
         connection.rollback()  # Rollback in case of error
-        logging.error(f"Error during record update: {e}")
+        logging.error(f"Python Logging Message: Error during record update: {e}")
         response = {'message': f'Error: {e}'}
 
     cursor.close()
@@ -144,14 +144,14 @@ def delete_record(id):
         cursor.execute("DELETE FROM users WHERE id = %s", (id,))
         connection.commit()  # Commit the transaction
         if cursor.rowcount > 0:
-            logging.info(f"Record with ID {id} deleted successfully.")
+            logging.info(f"Python Logging Message: Record with ID {id} deleted successfully.")
             response = {'message': 'Record deleted successfully!'}
         else:
-            logging.warning(f"No record found with ID {id} to delete.")
+            logging.warning(f"Python Logging Message: No record found with ID {id} to delete.")
             response = {'message': 'No record found with the provided ID'}
     except Error as e:
         connection.rollback()  # Rollback in case of error
-        logging.error(f"Error during record deletion: {e}")
+        logging.error(f"Python Logging Message: Error during record deletion: {e}")
         response = {'message': f'Error: {e}'}
 
     cursor.close()
