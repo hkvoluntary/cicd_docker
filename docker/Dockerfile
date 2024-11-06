@@ -21,7 +21,7 @@ FROM base as development
 ENV FLASK_ENV=development
 
 # Default command for development (runs Flask's built-in development server)
-CMD ["flask", "run", "--host=0.0.0.0"]
+#CMD ["flask", "run", "--host=0.0.0.0"]
 
 FROM base as production
 ENV FLASK_ENV=production
