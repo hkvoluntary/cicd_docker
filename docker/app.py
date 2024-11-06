@@ -3,6 +3,7 @@ import logging
 from flask import Flask, request, jsonify
 import mysql.connector
 from mysql.connector import Error
+import json
 
 app = Flask(__name__)
 
@@ -23,9 +24,24 @@ else:
                         handlers=[logging.StreamHandler()])
     logging.info("Logging set to DEBUG level (Development).")
 
+# Load MySQL connection configuration from a file
+def load_db_config():
+    config_path = 'db_config.json'
+    if not os.path.exists(config_path):
+        logging.error("Database configuration file not found.")
+        return None
+    with open(config_path, 'r') as file:
+        config = json.load(file)
+    return config
+    
 # MySQL connection configuration
 def create_connection():
     connection = None
+    
+    db_config = load_db_config()
+    if db_config is None:
+        logging.error("MySQL configuration could not be loaded.")
+        return None
     try:
         connection = mysql.connector.connect(
             host='172.17.0.3',   # MySQL host (e.g., 'localhost' or Docker container name)
