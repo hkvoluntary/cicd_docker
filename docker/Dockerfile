@@ -14,12 +14,13 @@ RUN pip install --no-cache-dir -r requirements.txt
 # Set to 'development' for development environment
 #ENV FLASK_ENV=production  
 
+FROM base as production
+ENV FLASK_ENV=production
 # Multi-stage build for development and production
 FROM base as development
 ENV FLASK_ENV=development
 
-FROM base as production
-ENV FLASK_ENV=production
+
 
 # Expose the port the app will run on (if necessary)
 EXPOSE 5000
