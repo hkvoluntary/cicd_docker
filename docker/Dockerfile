@@ -26,8 +26,8 @@ CMD ["flask", "run", "--host=0.0.0.0"]
 FROM base as production
 ENV FLASK_ENV=production
 # Default command for production (runs the app with Gunicorn)
-CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
+#CMD ["gunicorn", "-b", "0.0.0.0:5000", "app:app"]
 
 
 # Set the default command to run your application
-#CMD ["python", "app.py"]
+CMD ["python3", "app.py"]
