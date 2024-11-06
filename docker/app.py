@@ -9,10 +9,10 @@ def create_connection():
     connection = None
     try:
         connection = mysql.connector.connect(
-            host='mysql_host',   # MySQL host (e.g., 'localhost' or Docker container name)
-            user='your_username',  # MySQL username
-            password='your_password',  # MySQL password
-            database='your_database'  # Database name
+            host='172.17.0.3',   # MySQL host (e.g., 'localhost' or Docker container name)
+            user='sql',  # MySQL username
+            password='sql1245',  # MySQL password
+            database='test_db'  # Database name
         )
         if connection.is_connected():
             print('Connection to MySQL successful')
