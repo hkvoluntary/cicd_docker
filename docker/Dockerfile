@@ -11,7 +11,8 @@ COPY ./docker /app
 RUN pip install --no-cache-dir -r requirements.txt
 
 # Set environment variable for Flask environment (default to development)
-ENV FLASK_ENV=production  # Set to 'development' for development environment
+# Set to 'development' for development environment
+ENV FLASK_ENV=production  
 
 # Expose the port the app will run on (if necessary)
 EXPOSE 5000
