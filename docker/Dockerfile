@@ -8,7 +8,7 @@ WORKDIR /app
 COPY ./docker /app
 
 # Install the required dependencies
-RUN pip install --no-cache-dir -r docker/requirements.txt
+RUN pip install --no-cache-dir -r requirements.txt
 
 # Expose the port the app will run on (if necessary)
 EXPOSE 5000
